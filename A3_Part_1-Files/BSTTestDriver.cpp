@@ -65,6 +65,13 @@ int main(int argc, char *argv[]) {
           WordPair aWordPair(englishW, translationW);
           
 		  // insert aWordPair into "testing" using a try/catch block
+          cout << "Inserting Element" << endl;
+          try {
+            testing->insert(aWordPair);
+          }
+          catch (UnableToInsertException()) {
+            cout << "UnableToInsertException" << endl;
+          }
         }
         myfile.close();
 

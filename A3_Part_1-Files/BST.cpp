@@ -35,7 +35,9 @@ using std::nothrow;
    // Copy constructor
    BST::BST(const BST & aBST) {
      
-	  // to do
+	  // shallow copy
+     root = aBST.root;
+     elementCount = aBST.elementCount;
    }
    
    // Overloaded oeprator
@@ -43,16 +45,36 @@ using std::nothrow;
    //              object to "this" BST object such that both objects
    //              are an exact, yet independent, copy of each other.
    void BST::operator=(const BST & rhs) {
-
-      // to do
-	  return;
-	  
+      // must be empty first
+      // deep copy
+      BSTNode* rootNode = new BSTNode;
+      root->element = rhs.root->element;
+      rootNode->left = overloadedAssignmentR(rootNode->left, (BSTNode*)&rhs.root->left);
+      rootNode->right = overloadedAssignmentR(rootNode->right, (BSTNode*)&rhs.root->right);
    }                
    
+   BSTNode* BST::overloadedAssignmentR(BSTNode* lhsCurrent, const BSTNode* rhsCurrent) {
+      if ((BST*)&rhsCurrent == nullptr) return nullptr;
+      // pre-order traversal
+      BSTNode* newNode = new BSTNode;
+      newNode->element = rhsCurrent->element;
+      lhsCurrent->left = overloadedAssignmentR(lhsCurrent->left, rhsCurrent->left); // go further down left
+      lhsCurrent->right = overloadedAssignmentR(lhsCurrent->right, rhsCurrent->right); // go further down right
+      return newNode; // go back up
+   }
+
    // Destructor 
    BST::~BST() {
-
       // to do
+      deconstructorR(root);
+   }
+
+   void BST::deconstructorR(BSTNode* current) {
+      if (current == nullptr) return;
+      deconstructorR(current->left);
+      // delete node
+      delete current;
+      deconstructorR(current->right);
    }                
    
    
@@ -62,9 +84,9 @@ using std::nothrow;
    // Postcondition: This method does not change the BST.
    // Time efficiency: O(1)
    unsigned int BST::getElementCount() const {     
-
+   
       // to do
-	 
+      return elementCount;
    }
 
    // Description: Inserts an element into the BST.
@@ -78,6 +100,29 @@ using std::nothrow;
    void BST::insert(WordPair & newElement) {
   
       // to do
+      // Throw exception if newElement is not a WordPair
+      if (typeid(newElement) != typeid(WordPair)) {
+         throw UnableToInsertException();
+      }
+
+      // Allocate memory
+      BSTNode* newNode = new BSTNode;
+      newNode->element = newElement;
+
+      // Cover empty case
+      if (root == nullptr) {
+         root = newNode;
+         elementCount = 1;
+         return;
+      }
+      // Begin recursion
+      if (insertR(newNode, root) == false) {
+         throw UnableToInsertException();
+      }
+      else {
+         elementCount += 1;
+      }
+
 	  return;
 	  
    } 
@@ -86,9 +131,33 @@ using std::nothrow;
    //              Returns true when "anElement" has been successfully inserted into the 
    //              BST. Otherwise, returns false.
    bool BST::insertR(BSTNode * newBSTNode, BSTNode * current) {  
-    
 	  // to do
-		
+
+      // check root
+      if (newBSTNode->element == current->element) {
+         // Throw exception if newElement is already in BST
+         throw ElementAlreadyExistsException();
+      }
+      // check right
+      else if (newBSTNode->element > current->element) {
+         if (current->right == nullptr) {
+            current->right = newBSTNode;
+            return true;
+         }
+         current = current->right;
+         insertR(newBSTNode, current->right);
+      }
+      // check left
+      else {
+         if (current->left == nullptr) {
+            current->left = newBSTNode;
+            return true;
+         }
+         current = current->left;
+         insertR(newBSTNode, current->left);      
+      }
+      // insert failed
+      return false;
    }
 
    
@@ -122,7 +191,26 @@ using std::nothrow;
    WordPair& BST::retrieveR(WordPair & targetElement, BSTNode * current) const {
 
 	  // to do
-		
+      if (targetElement == current->element) {
+         return current->element;
+      }
+      else if (targetElement > current->element){
+         // check right
+         if (current->right == nullptr) {
+            throw ElementDoesNotExistException();
+         }
+         current = current->right;
+         return retrieveR(targetElement, current->right);
+      }
+      else {
+         // check left
+         if (current->left == nullptr) {
+            throw ElementDoesNotExistException();
+         }
+         current = current->left;
+         return retrieveR(targetElement, current->left);      
+      }
+
    }  
    
    // Description: Traverses the BST in order.
@@ -150,6 +238,9 @@ using std::nothrow;
    // Postcondition: This method does not change the BST. 
    void BST::traverseInOrderR(void visit(WordPair &), BSTNode* current) const { 
    
-	  // to do
-	  
+	  // to do 
+      if (current == nullptr) return;
+      traverseInOrderR(visit, current->left);
+      visit(current->element);
+      traverseInOrderR(visit, current->right);
    }

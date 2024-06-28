@@ -36,7 +36,7 @@ private:
    
    // Description: Recursive insertion into a BST.
    //              Returns true when "anElement" has been successfully inserted into the 
-   //              BST. Otherwise, returns false.
+   //              BST. Otherwise, returns false. 
    bool insertR(BSTNode * newBSTNode, BSTNode * current);
 
    // Description: Recursive retrieval from a BST.
@@ -49,6 +49,13 @@ private:
    // Postcondition: This method does not change the BST.
    void traverseInOrderR(void visit(WordPair &), BSTNode * current) const;
 
+   // Description: Modified recursive traverse that deletes instead of visiting.
+   // Postcondition: This method deletes the BST.
+   void deconstructorR(BSTNode* current);
+
+   // Description: A Pre-Order traversal to make a deep copy of a rhs to lhs
+   // Postcondition: This method makes an exact, yet independent BST.
+   BSTNode* overloadedAssignmentR(BSTNode* lhsCurrent, const BSTNode* rhsCurrent);
 
 public:
 
