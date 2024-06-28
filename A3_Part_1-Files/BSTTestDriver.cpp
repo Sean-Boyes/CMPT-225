@@ -32,6 +32,9 @@ void display(WordPair& anElement) {
   cout << anElement;
 } 
 
+void visit(WordPair & addr) {
+  cout << addr.getEnglish() << endl;
+}
 
 // As you discover what main() does, record your understanding of the code by commenting it.
 // If you do not like this main(), feel free to write your own.
@@ -69,14 +72,45 @@ int main(int argc, char *argv[]) {
           try {
             testing->insert(aWordPair);
           }
-          catch (UnableToInsertException()) {
-            cout << "UnableToInsertException" << endl;
+          catch (UnableToInsertException& anException) {
+            cout << "Insert unsuccessful because" << anException.what() << endl << endl;
+          }
+          catch (ElementAlreadyExistsException& anException) {
+            cout << "Insert unsuccessful because" << anException.what() << endl << endl;
           }
         }
         myfile.close();
+        cout << endl << endl;
+      }
+      // reset file for retrieve
+      ifstream myfileSame(filename);
+      if (myfileSame.is_open()) {
+        cout << "Retrieving from file" << endl;
+        while ( getline (myfileSame,aLine) ) {
+          pos = aLine.find(delimiter);    
+          englishW = aLine.substr(0, pos);
+          aLine.erase(0, pos + delimiter.length());
+          translationW = aLine;
+          WordPair aWordPair(englishW, translationW);
+          
+		  // retrieve aWordPair into "testing" using a try/catch block
+          WordPair currentWordPair;
+          cout << "Retrieving Element" << endl;
+          try {
+            currentWordPair = testing->retrieve(aWordPair);
+            if (currentWordPair.getEnglish() != aWordPair.getEnglish()) {
+              cout << "Retrieved failed at " << aWordPair.getEnglish() << endl;
+            }
+            cout << "expected: " << aWordPair << "got       " << currentWordPair << endl;
+          }
+          catch (ElementAlreadyExistsException& anException) {
+            cout << "Retrieve unsuccessful because" << anException.what() << endl << endl;
+          }
+        }
+        myfileSame.close();
 
-        // More BST testing happening here!
-		
+        // test traverse
+        testing->traverseInOrder(display);
       }
 	  else 
         cout << "Unable to open file" << endl;

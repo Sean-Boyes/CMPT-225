@@ -26,6 +26,11 @@ using std::nothrow;
 // class because the prototype of these public methods don't match, 
 // we won't be able to successfully mark your assignment.
 
+bool DEBUG = false;
+
+void LOG(string debugMsg) {
+   if (DEBUG) cout << debugMsg << endl;
+}
 
 /* Constructors and destructor */
 
@@ -49,6 +54,7 @@ using std::nothrow;
       // deep copy
       BSTNode* rootNode = new BSTNode;
       root->element = rhs.root->element;
+      elementCount = rhs.elementCount;
       rootNode->left = overloadedAssignmentR(rootNode->left, (BSTNode*)&rhs.root->left);
       rootNode->right = overloadedAssignmentR(rootNode->right, (BSTNode*)&rhs.root->right);
    }                
@@ -66,6 +72,7 @@ using std::nothrow;
    // Destructor 
    BST::~BST() {
       // to do
+      elementCount = 0;
       deconstructorR(root);
    }
 
@@ -106,16 +113,19 @@ using std::nothrow;
       }
 
       // Allocate memory
+      LOG("creating new element");
       BSTNode* newNode = new BSTNode;
       newNode->element = newElement;
 
       // Cover empty case
       if (root == nullptr) {
+         LOG("I am root");
          root = newNode;
          elementCount = 1;
          return;
       }
       // Begin recursion
+      LOG("startign recursion");
       if (insertR(newNode, root) == false) {
          throw UnableToInsertException();
       }
@@ -136,25 +146,32 @@ using std::nothrow;
       // check root
       if (newBSTNode->element == current->element) {
          // Throw exception if newElement is already in BST
+         LOG("Thowing exception");
          throw ElementAlreadyExistsException();
       }
       // check right
       else if (newBSTNode->element > current->element) {
+         LOG("[R] going right");
          if (current->right == nullptr) {
+            LOG("[CR] connecting pointer to right");
             current->right = newBSTNode;
             return true;
          }
-         current = current->right;
+         // current = current->right;
          insertR(newBSTNode, current->right);
+         return true;
       }
       // check left
       else {
+         LOG("[L] going left");
          if (current->left == nullptr) {
+            LOG("[CL] connecting pointer to left");
             current->left = newBSTNode;
             return true;
          }
-         current = current->left;
+         // current = current->left;
          insertR(newBSTNode, current->left);      
+         return true;
       }
       // insert failed
       return false;
@@ -199,7 +216,7 @@ using std::nothrow;
          if (current->right == nullptr) {
             throw ElementDoesNotExistException();
          }
-         current = current->right;
+         // current = current->right;
          return retrieveR(targetElement, current->right);
       }
       else {
@@ -207,7 +224,7 @@ using std::nothrow;
          if (current->left == nullptr) {
             throw ElementDoesNotExistException();
          }
-         current = current->left;
+         // current = current->left;
          return retrieveR(targetElement, current->left);      
       }
 
